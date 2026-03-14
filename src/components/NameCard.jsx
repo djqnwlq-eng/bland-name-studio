@@ -22,14 +22,18 @@ export default function NameCard({ item, pattern }) {
     }
   }
 
-  const riskClass =
-    item.risk === '높음' ? 'risk-high' : item.risk === '보통' ? 'risk-mid' : 'risk-low';
+  const riskMap = {
+    '낮음': { cls: 'risk-low', icon: '\u2705', label: '\uC0C1\uD45C\uC704\uD5D8 \uB0AE\uC74C' },
+    '보통': { cls: 'risk-mid', icon: '\u26A0\uFE0F', label: '\uC0C1\uD45C\uC704\uD5D8 \uBCF4\uD1B5' },
+    '높음': { cls: 'risk-high', icon: '\uD83D\uDEA8', label: '\uC0C1\uD45C\uC704\uD5D8 \uB192\uC74C' },
+  };
+  const risk = riskMap[item.risk] || riskMap['보통'];
 
   return (
     <div className="name-card">
       <div className="name-card-badges">
         <span className="badge pattern-badge">{pattern.name}</span>
-        <span className={`badge ${riskClass}`}>{item.risk}</span>
+        <span className={`badge ${risk.cls}`}>{risk.icon} {risk.label}</span>
       </div>
 
       <h3 className="name-card-name">{item.name}</h3>

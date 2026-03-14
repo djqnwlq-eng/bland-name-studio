@@ -67,6 +67,36 @@ body {
   padding: 4px 14px;
 }
 
+/* ───── Selection Summary ───── */
+.selection-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 0;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.summary-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(200, 169, 110, 0.06);
+  border: 1px solid rgba(200, 169, 110, 0.15);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+}
+
+.summary-label {
+  color: var(--text-dim);
+}
+
+.summary-value {
+  color: var(--gold);
+  font-weight: 500;
+}
+
 /* ───── Progress Bar ───── */
 .progress-track {
   height: 2px;

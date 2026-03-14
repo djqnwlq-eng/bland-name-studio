@@ -6,6 +6,7 @@ import Step2Pattern from './components/Step2Pattern';
 import Step3Input from './components/Step3Input';
 import Step4Sound from './components/Step4Sound';
 import Step5Result from './components/Step5Result';
+import SelectionSummary from './components/SelectionSummary';
 
 export default function App() {
   const [step, setStep] = useState(1);
@@ -26,9 +27,20 @@ export default function App() {
     setStep(s);
   }
 
+  function handleReset() {
+    setStep(1);
+    setPosition(null);
+    setPattern(null);
+    setInputs({});
+    setSyllable(0);
+    setTone('부드럽게');
+    setResults(null);
+    setError(null);
+  }
+
   return (
     <div className="app">
-      <Header step={step} />
+      <Header step={step} onReset={handleReset} />
       <ProgressBar step={step} />
 
       {apiKeyMissing && (
@@ -37,6 +49,17 @@ export default function App() {
           <br />
           <span>.env 파일에 Gemini API 키를 입력한 뒤 서버를 재시작하세요.</span>
         </div>
+      )}
+
+      {step > 1 && (
+        <SelectionSummary
+          position={position}
+          pattern={pattern}
+          inputs={inputs}
+          syllable={syllable}
+          tone={tone}
+          step={step}
+        />
       )}
 
       <main className="main">
