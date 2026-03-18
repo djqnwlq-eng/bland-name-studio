@@ -8,16 +8,16 @@
 }
 
 :root {
-  --bg: #0d0d0d;
-  --card-bg: #0c0c0c;
-  --border: #181818;
-  --text: #ffffff;
-  --text-dim: #b0aaa2;
-  --gold: #c8a96e;
-  --gold-bg: rgba(200, 169, 110, 0.03);
-  --red: #c26b6b;
-  --green: #6bc28a;
-  --yellow: #c2b06b;
+  --bg: #faf7f2;
+  --card-bg: #ffffff;
+  --border: #e8e0d4;
+  --text: #2c2420;
+  --text-dim: #8a7e72;
+  --gold: #b8935a;
+  --gold-bg: rgba(184, 147, 90, 0.06);
+  --red: #c0564f;
+  --green: #4a9e6b;
+  --yellow: #b8a04a;
 }
 
 html {
@@ -128,7 +128,7 @@ body {
 }
 
 .api-warning code {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(192, 86, 79, 0.08);
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 13px;
@@ -194,7 +194,8 @@ body {
 }
 
 .card.selectable:hover {
-  border-color: #2a2a2a;
+  border-color: #cdc3b5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .card.selected {
@@ -207,7 +208,7 @@ body {
   font-size: 18px;
   font-weight: 400;
   margin-bottom: 6px;
-  color: #ffffff;
+  color: var(--text);
 }
 
 .card-desc {
@@ -243,7 +244,7 @@ body {
   top: 10px;
   right: 10px;
   background: var(--gold);
-  color: var(--bg);
+  color: #ffffff;
   font-weight: 700;
 }
 
@@ -304,6 +305,12 @@ body {
   border-color: var(--gold);
 }
 
+.field-textarea {
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
 /* ───── Sound Chips ───── */
 .sound-group {
   margin-bottom: 32px;
@@ -334,7 +341,7 @@ body {
 }
 
 .chip:hover {
-  border-color: #2a2a2a;
+  border-color: #cdc3b5;
 }
 
 .chip.active {
@@ -381,18 +388,18 @@ body {
 }
 
 .btn-back:hover {
-  border-color: #2a2a2a;
+  border-color: #cdc3b5;
   color: var(--text);
 }
 
 .btn-next {
   background: var(--gold);
-  color: var(--bg);
+  color: #ffffff;
   font-weight: 700;
 }
 
 .btn-next:hover {
-  background: #d4b87a;
+  background: #a6834e;
 }
 
 .btn-next:disabled {
@@ -464,6 +471,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 24px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 .name-card-badges {
@@ -568,6 +576,13 @@ body {
 .strengthened-reason {
   font-size: 11px;
   color: var(--text-dim);
+}
+
+.strengthened-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
 }
 
 /* ───── Result Actions ───── */

@@ -1,20 +1,17 @@
 import { useState } from 'react';
 import Header from './components/Header';
 import ProgressBar from './components/ProgressBar';
-import Step1Position from './components/Step1Position';
-import Step2Pattern from './components/Step2Pattern';
-import Step3Input from './components/Step3Input';
-import Step4Sound from './components/Step4Sound';
-import Step5Result from './components/Step5Result';
+import Step1CoreValue from './components/Step1CoreValue';
+import Step2Feeling from './components/Step2Feeling';
+import Step3Position from './components/Step3Position';
+import Step4Result from './components/Step4Result';
 import SelectionSummary from './components/SelectionSummary';
 
 export default function App() {
   const [step, setStep] = useState(1);
+  const [coreValue, setCoreValue] = useState('');
+  const [feeling, setFeeling] = useState('');
   const [position, setPosition] = useState(null);
-  const [pattern, setPattern] = useState(null);
-  const [inputs, setInputs] = useState({});
-  const [syllable, setSyllable] = useState(0);
-  const [tone, setTone] = useState('부드럽게');
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
 
@@ -29,11 +26,9 @@ export default function App() {
 
   function handleReset() {
     setStep(1);
+    setCoreValue('');
+    setFeeling('');
     setPosition(null);
-    setPattern(null);
-    setInputs({});
-    setSyllable(0);
-    setTone('부드럽게');
     setResults(null);
     setError(null);
   }
@@ -53,73 +48,56 @@ export default function App() {
 
       {step > 1 && (
         <SelectionSummary
+          coreValue={coreValue}
+          feeling={feeling}
           position={position}
-          pattern={pattern}
-          inputs={inputs}
-          syllable={syllable}
-          tone={tone}
           step={step}
         />
       )}
 
       <main className="main">
         {step === 1 && (
-          <Step1Position
-            selected={position}
-            onSelect={(p) => {
-              setPosition(p);
-              goTo(2);
-            }}
+          <Step1CoreValue
+            value={coreValue}
+            onChange={setCoreValue}
+            onNext={() => goTo(2)}
           />
         )}
 
         {step === 2 && (
-          <Step2Pattern
-            position={position}
-            selected={pattern}
-            onSelect={(p) => {
-              setPattern(p);
-              setInputs({});
-              goTo(3);
-            }}
+          <Step2Feeling
+            value={feeling}
+            onChange={setFeeling}
+            onNext={() => goTo(3)}
             onBack={() => goTo(1)}
           />
         )}
 
         {step === 3 && (
-          <Step3Input
-            pattern={pattern}
-            inputs={inputs}
-            onChange={(key, val) => setInputs((prev) => ({ ...prev, [key]: val }))}
-            onNext={() => goTo(4)}
+          <Step3Position
+            selected={position}
+            onSelect={(p) => {
+              setPosition(p);
+              goTo(4);
+            }}
             onBack={() => goTo(2)}
           />
         )}
 
         {step === 4 && (
-          <Step4Sound
-            syllable={syllable}
-            tone={tone}
-            onSyllableChange={setSyllable}
-            onToneChange={setTone}
-            onGenerate={() => goTo(5)}
-            onBack={() => goTo(3)}
-          />
-        )}
-
-        {step === 5 && (
-          <Step5Result
+          <Step4Result
             position={position}
-            pattern={pattern}
-            inputs={inputs}
-            syllable={syllable}
-            tone={tone}
+            coreValue={coreValue}
+            feeling={feeling}
             results={results}
             setResults={setResults}
             error={error}
             setError={setError}
-            onGoToStep4={() => goTo(4)}
-            onGoToStep2={() => goTo(2)}
+            onGoToStep3={() => goTo(3)}
+            onGoToStep1={() => {
+              setResults(null);
+              goTo(1);
+            }}
           />
         )}
       </main>

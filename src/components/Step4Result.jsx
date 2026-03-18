@@ -2,18 +2,16 @@ import { useEffect, useState } from 'react';
 import { generateNames } from '../lib/gemini';
 import NameCard from './NameCard';
 
-export default function Step5Result({
+export default function Step4Result({
   position,
-  pattern,
-  inputs,
-  syllable,
-  tone,
+  coreValue,
+  feeling,
   results,
   setResults,
   error,
   setError,
-  onGoToStep4,
-  onGoToStep2,
+  onGoToStep3,
+  onGoToStep1,
 }) {
   const [loading, setLoading] = useState(false);
 
@@ -22,7 +20,7 @@ export default function Step5Result({
     setError(null);
     setResults(null);
     try {
-      const data = await generateNames({ position, pattern, inputs, syllable, tone });
+      const data = await generateNames({ position, coreValue, feeling });
       setResults(data.names);
     } catch (err) {
       console.error(err);
@@ -63,19 +61,19 @@ export default function Step5Result({
         <>
           <div className="name-list">
             {results.map((item, i) => (
-              <NameCard key={i} item={item} pattern={pattern} />
+              <NameCard key={i} item={item} />
             ))}
           </div>
 
           <div className="result-actions">
-            <button className="btn-back" onClick={onGoToStep4}>
-              &larr; 설정 변경
+            <button className="btn-back" onClick={onGoToStep1}>
+              &larr; 처음부터 다시
             </button>
             <button className="btn-next" onClick={generate}>
-              &orarr; 재생성
+              재생성
             </button>
-            <button className="btn-back" onClick={onGoToStep2}>
-              패턴 바꾸기
+            <button className="btn-back" onClick={onGoToStep3}>
+              포지셔닝 변경
             </button>
           </div>
         </>

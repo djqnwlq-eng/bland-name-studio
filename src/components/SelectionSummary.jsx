@@ -1,22 +1,16 @@
-export default function SelectionSummary({ position, pattern, inputs, syllable, tone, step }) {
+export default function SelectionSummary({ coreValue, feeling, position, step }) {
   const items = [];
 
-  if (position) {
-    items.push({ label: '\uD3EC\uC9C0\uC154\uB2DD', value: position.name });
+  if (coreValue && step > 1) {
+    const display = coreValue.length > 30 ? coreValue.slice(0, 30) + '...' : coreValue;
+    items.push({ label: '핵심가치', value: display });
   }
-  if (pattern && step > 2) {
-    items.push({ label: '\uD328\uD134', value: `${pattern.num} ${pattern.name}` });
+  if (feeling && step > 2) {
+    const display = feeling.length > 30 ? feeling.slice(0, 30) + '...' : feeling;
+    items.push({ label: '소비자 느낌', value: display });
   }
-  if (inputs && step > 3) {
-    pattern?.questions.forEach((q) => {
-      if (inputs[q.key]?.trim()) {
-        items.push({ label: q.label, value: inputs[q.key] });
-      }
-    });
-  }
-  if (step > 4) {
-    items.push({ label: '\uC74C\uC808', value: syllable === 0 ? 'AI \uACB0\uC815' : `${syllable}\uC74C\uC808` });
-    items.push({ label: '\uBC1C\uC74C', value: tone });
+  if (position && step > 3) {
+    items.push({ label: '포지셔닝', value: position.name });
   }
 
   if (items.length === 0) return null;

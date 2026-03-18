@@ -1,6 +1,6 @@
 import positions from '../data/positions';
 
-export default function Step1Position({ selected, onSelect }) {
+export default function Step3Position({ selected, onSelect, onBack }) {
   return (
     <section className="step-section">
       <h2 className="step-title">브랜드 포지셔닝을 선택하세요</h2>
@@ -17,6 +17,12 @@ export default function Step1Position({ selected, onSelect }) {
             <p className="card-desc">{pos.desc}</p>
           </button>
         ))}
+      </div>
+
+      <div className="nav-row">
+        <button className="btn-back" onClick={onBack}>
+          &larr; 이전
+        </button>
       </div>
     </section>
   );
