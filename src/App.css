@@ -8,14 +8,14 @@
 }
 
 :root {
-  --bg: #faf7f2;
+  --bg: #f5f5f5;
   --card-bg: #ffffff;
-  --border: #e8e0d4;
-  --text: #2c2420;
-  --text-dim: #8a7e72;
-  --gold: #b8935a;
-  --gold-bg: rgba(184, 147, 90, 0.06);
-  --red: #c0564f;
+  --border: #e0e0e0;
+  --text: #222222;
+  --text-dim: #888888;
+  --primary: #D32F2F;
+  --primary-bg: rgba(211, 47, 47, 0.06);
+  --red: #D32F2F;
   --green: #4a9e6b;
   --yellow: #b8a04a;
 }
@@ -27,7 +27,7 @@ html {
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
   line-height: 1.6;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
@@ -51,10 +51,10 @@ body {
 }
 
 .logo {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Pretendard Variable', Pretendard, sans-serif;
   font-size: 22px;
-  color: var(--gold);
-  font-weight: 400;
+  color: var(--primary);
+  font-weight: 700;
 }
 
 .step-pill {
@@ -81,8 +81,8 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(200, 169, 110, 0.06);
-  border: 1px solid rgba(200, 169, 110, 0.15);
+  background: rgba(211, 47, 47, 0.06);
+  border: 1px solid rgba(211, 47, 47, 0.12);
   border-radius: 20px;
   padding: 4px 12px;
   font-size: 12px;
@@ -93,7 +93,7 @@ body {
 }
 
 .summary-value {
-  color: var(--gold);
+  color: var(--primary);
   font-weight: 500;
 }
 
@@ -106,7 +106,7 @@ body {
 
 .progress-fill {
   height: 100%;
-  background: var(--gold);
+  background: var(--primary);
   transition: width 0.4s ease;
 }
 
@@ -156,7 +156,7 @@ body {
 }
 
 .step-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Pretendard Variable', Pretendard, sans-serif;
   font-size: 26px;
   font-weight: 400;
   margin-bottom: 8px;
@@ -190,21 +190,21 @@ body {
   transition: all 0.2s ease;
   position: relative;
   color: var(--text);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
 }
 
 .card.selectable:hover {
-  border-color: #cdc3b5;
+  border-color: #ccc;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .card.selected {
-  border-color: var(--gold);
-  background: var(--gold-bg);
+  border-color: var(--primary);
+  background: var(--primary-bg);
 }
 
 .card-name {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Pretendard Variable', Pretendard, sans-serif;
   font-size: 18px;
   font-weight: 400;
   margin-bottom: 6px;
@@ -223,7 +223,7 @@ body {
 }
 
 .pattern-num {
-  color: var(--gold);
+  color: var(--primary);
   font-size: 14px;
   display: block;
   margin-bottom: 6px;
@@ -243,14 +243,14 @@ body {
   position: absolute;
   top: 10px;
   right: 10px;
-  background: var(--gold);
+  background: var(--primary);
   color: #ffffff;
   font-weight: 700;
 }
 
 .badge.pattern-badge {
-  background: rgba(200, 169, 110, 0.12);
-  color: var(--gold);
+  background: rgba(211, 47, 47, 0.10);
+  color: var(--primary);
 }
 
 .badge.risk-low {
@@ -290,7 +290,7 @@ body {
   border-radius: 8px;
   padding: 14px 16px;
   color: var(--text);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
   font-size: 15px;
   outline: none;
   transition: border-color 0.2s;
@@ -302,7 +302,7 @@ body {
 }
 
 .field-input:focus {
-  border-color: var(--gold);
+  border-color: var(--primary);
 }
 
 .field-textarea {
@@ -337,16 +337,16 @@ body {
   transition: all 0.2s;
   text-align: center;
   color: var(--text);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
 }
 
 .chip:hover {
-  border-color: #cdc3b5;
+  border-color: #ccc;
 }
 
 .chip.active {
-  border-color: var(--gold);
-  background: var(--gold-bg);
+  border-color: var(--primary);
+  background: var(--primary-bg);
 }
 
 .chip-label {
@@ -372,7 +372,7 @@ body {
 
 .btn-back,
 .btn-next {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
   font-size: 14px;
   padding: 12px 28px;
   border-radius: 8px;
@@ -388,18 +388,18 @@ body {
 }
 
 .btn-back:hover {
-  border-color: #cdc3b5;
+  border-color: #ccc;
   color: var(--text);
 }
 
 .btn-next {
-  background: var(--gold);
+  background: var(--primary);
   color: #ffffff;
   font-weight: 700;
 }
 
 .btn-next:hover {
-  background: #a6834e;
+  background: #B71C1C;
 }
 
 .btn-next:disabled {
@@ -423,7 +423,7 @@ body {
   width: 32px;
   height: 32px;
   border: 2px solid var(--border);
-  border-top-color: var(--gold);
+  border-top-color: var(--primary);
   border-radius: 50%;
   margin: 0 auto;
   animation: spin 0.7s linear infinite;
@@ -434,7 +434,7 @@ body {
   width: 14px;
   height: 14px;
   border: 2px solid var(--border);
-  border-top-color: var(--gold);
+  border-top-color: var(--primary);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
   vertical-align: middle;
@@ -481,7 +481,7 @@ body {
 }
 
 .name-card-name {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Pretendard Variable', Pretendard, sans-serif;
   font-size: 28px;
   font-weight: 400;
   margin-bottom: 4px;
@@ -494,7 +494,7 @@ body {
 }
 
 .name-card-basis {
-  color: var(--gold);
+  color: var(--primary);
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -524,7 +524,7 @@ body {
 }
 
 .strengthen-btn {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
   font-size: 12px;
   background: transparent;
   border: 1px solid var(--border);
@@ -536,7 +536,7 @@ body {
 }
 
 .strengthen-btn:hover:not(:disabled) {
-  border-color: var(--gold);
+  border-color: var(--primary);
   color: var(--text);
 }
 
@@ -548,16 +548,16 @@ body {
 .strengthened-result {
   margin-top: 16px;
   padding: 16px;
-  background: var(--gold-bg);
-  border: 1px solid rgba(200, 169, 110, 0.15);
+  background: var(--primary-bg);
+  border: 1px solid rgba(211, 47, 47, 0.12);
   border-radius: 8px;
   animation: fadeIn 0.3s ease;
 }
 
 .strengthened-name {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Pretendard Variable', Pretendard, sans-serif;
   font-size: 22px;
-  color: var(--gold);
+  color: var(--primary);
   margin-bottom: 4px;
 }
 
