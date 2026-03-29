@@ -10,6 +10,7 @@ export default function Step4Result({
   setResults,
   error,
   setError,
+  apiKey,
   onGoToStep3,
   onGoToStep1,
 }) {
@@ -20,7 +21,7 @@ export default function Step4Result({
     setError(null);
     setResults(null);
     try {
-      const data = await generateNames({ position, coreValue, feeling });
+      const data = await generateNames({ position, coreValue, feeling, apiKey });
       setResults(data.names);
     } catch (err) {
       console.error(err);
@@ -61,7 +62,7 @@ export default function Step4Result({
         <>
           <div className="name-list">
             {results.map((item, i) => (
-              <NameCard key={i} item={item} />
+              <NameCard key={i} item={item} apiKey={apiKey} />
             ))}
           </div>
 

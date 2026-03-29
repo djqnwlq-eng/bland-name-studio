@@ -13,9 +13,9 @@
   --border: #e0e0e0;
   --text: #222222;
   --text-dim: #888888;
-  --primary: #D32F2F;
-  --primary-bg: rgba(211, 47, 47, 0.06);
-  --red: #D32F2F;
+  --primary: #9B2335;
+  --primary-bg: rgba(155, 35, 53, 0.06);
+  --red: #9B2335;
   --green: #4a9e6b;
   --yellow: #b8a04a;
 }
@@ -31,6 +31,68 @@ body {
   line-height: 1.6;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+}
+
+/* ───── Landing Page ───── */
+.landing {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.landing-card {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 48px 36px 36px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+}
+
+.landing-title {
+  font-family: 'Pretendard Variable', Pretendard, sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary);
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.landing-subtitle {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 14px;
+  margin-bottom: 36px;
+}
+
+.landing-section {
+  margin-bottom: 24px;
+}
+
+.btn-start {
+  width: 100%;
+  padding: 14px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Pretendard Variable', Pretendard, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 4px;
+}
+
+.btn-start:hover {
+  background: #7A1C2A;
+}
+
+.btn-start:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 /* ───── App Layout ───── */
@@ -81,8 +143,8 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(211, 47, 47, 0.06);
-  border: 1px solid rgba(211, 47, 47, 0.12);
+  background: rgba(155, 35, 53, 0.06);
+  border: 1px solid rgba(155, 35, 53, 0.12);
   border-radius: 20px;
   padding: 4px 12px;
   font-size: 12px;
@@ -249,7 +311,7 @@ body {
 }
 
 .badge.pattern-badge {
-  background: rgba(211, 47, 47, 0.10);
+  background: rgba(155, 35, 53, 0.10);
   color: var(--primary);
 }
 
@@ -399,7 +461,7 @@ body {
 }
 
 .btn-next:hover {
-  background: #B71C1C;
+  background: #7A1C2A;
 }
 
 .btn-next:disabled {
@@ -549,7 +611,7 @@ body {
   margin-top: 16px;
   padding: 16px;
   background: var(--primary-bg);
-  border: 1px solid rgba(211, 47, 47, 0.12);
+  border: 1px solid rgba(155, 35, 53, 0.12);
   border-radius: 8px;
   animation: fadeIn 0.3s ease;
 }
@@ -593,14 +655,328 @@ body {
   flex-wrap: wrap;
 }
 
+/* ───── Header Right ───── */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ───── API Key Pill ───── */
+.api-key-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(155, 35, 53, 0.08);
+  border: 1.5px solid rgba(155, 35, 53, 0.25);
+  border-radius: 24px;
+  padding: 6px 16px;
+  font-family: 'Pretendard Variable', Pretendard, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--primary);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.api-key-pill:hover {
+  background: rgba(155, 35, 53, 0.14);
+  border-color: var(--primary);
+}
+
+.api-key-pill.set {
+  background: rgba(74, 158, 107, 0.08);
+  border-color: rgba(74, 158, 107, 0.25);
+  color: var(--green);
+}
+
+.api-key-pill.set:hover {
+  background: rgba(74, 158, 107, 0.14);
+  border-color: var(--green);
+}
+
+.api-key-pill svg {
+  flex-shrink: 0;
+}
+
+/* ───── Modal ───── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-content {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 28px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.modal-title {
+  font-family: 'Pretendard Variable', Pretendard, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: var(--text);
+}
+
+/* ───── API Status ───── */
+.api-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  margin-bottom: 20px;
+  color: var(--text-dim);
+}
+
+.api-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.api-status.unset .api-status-dot {
+  background: var(--red);
+}
+
+.api-status.set .api-status-dot {
+  background: var(--green);
+}
+
+/* ───── Modal Input ───── */
+.modal-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.api-input-row {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.api-input-row .field-input {
+  padding-right: 44px;
+}
+
+.toggle-visibility {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-visibility:hover {
+  color: var(--text);
+}
+
+/* ───── Modal Actions ───── */
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.btn-save {
+  flex: 1;
+  padding: 12px;
+  background: var(--text);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Pretendard Variable', Pretendard, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-save:hover {
+  opacity: 0.85;
+}
+
+.btn-save:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btn-delete {
+  padding: 12px 20px;
+  background: var(--card-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: 'Pretendard Variable', Pretendard, sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-delete:hover:not(:disabled) {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.btn-delete:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ───── API Guide ───── */
+.api-guide {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.guide-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: none;
+  border: none;
+  font-family: 'Pretendard Variable', Pretendard, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.guide-arrow {
+  font-size: 18px;
+  transition: transform 0.2s;
+  transform: rotate(180deg);
+}
+
+.guide-arrow.open {
+  transform: rotate(0deg);
+}
+
+.guide-content {
+  padding: 0 16px 16px;
+  animation: fadeIn 0.2s ease;
+}
+
+.guide-content h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.guide-content ol {
+  padding-left: 20px;
+  margin-bottom: 12px;
+}
+
+.guide-content li {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+  line-height: 1.6;
+}
+
+.guide-content a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.guide-content hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 12px 0;
+}
+
+.guide-note {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+.api-privacy {
+  font-size: 12px;
+  color: var(--text-dim);
+  text-align: center;
+}
+
 /* ───── Mobile ───── */
 @media (max-width: 600px) {
   .app {
     padding: 16px 14px 60px;
   }
 
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
   .logo {
     font-size: 18px;
+  }
+
+  .api-key-pill {
+    font-size: 11px;
+    padding: 5px 12px;
+  }
+
+  .landing-card {
+    padding: 36px 24px 28px;
+  }
+
+  .landing-title {
+    font-size: 24px;
   }
 
   .step-title {

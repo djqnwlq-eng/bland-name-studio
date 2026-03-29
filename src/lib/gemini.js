@@ -1,8 +1,11 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+function getGenAI(apiKey) {
+  return new GoogleGenerativeAI(apiKey);
+}
 
-export async function generateNames({ position, coreValue, feeling }) {
+export async function generateNames({ position, coreValue, feeling, apiKey }) {
+  const genAI = getGenAI(apiKey);
   const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
   const prompt = `당신은 전문 화장품 브랜드 네이머입니다.
@@ -80,7 +83,8 @@ ${position.id === 'kbeauty' ? '7. 반드시 순수 한글 이름으로 생성 (�
   return JSON.parse(text);
 }
 
-export async function strengthenName({ name, story, patternName }) {
+export async function strengthenName({ name, story, patternName, apiKey }) {
+  const genAI = getGenAI(apiKey);
   const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
   const prompt = `당신은 화장품 브랜드 네이밍 전문가입니다.

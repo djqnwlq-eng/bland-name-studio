@@ -6,6 +6,13 @@ import Step2Feeling from './components/Step2Feeling';
 import Step3Position from './components/Step3Position';
 import Step4Result from './components/Step4Result';
 import SelectionSummary from './components/SelectionSummary';
+import LandingPage from './components/LandingPage';
+
+const STORAGE_KEY = 'gemini_api_key';
+
+function getStoredKey() {
+  return localStorage.getItem(STORAGE_KEY) || '';
+}
 
 export default function App() {
   const [step, setStep] = useState(1);
@@ -14,10 +21,7 @@ export default function App() {
   const [position, setPosition] = useState(null);
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
-
-  const apiKeyMissing =
-    !import.meta.env.VITE_GEMINI_API_KEY ||
-    import.meta.env.VITE_GEMINI_API_KEY === 'your_gemini_api_key_here';
+  const [apiKey, setApiKey] = useState(getStoredKey);
 
   function goTo(s) {
     setError(null);
@@ -33,18 +37,25 @@ export default function App() {
     setError(null);
   }
 
+  function handleStart(key) {
+    localStorage.setItem(STORAGE_KEY, key);
+    setApiKey(key);
+  }
+
+  function handleLogout() {
+    localStorage.removeItem(STORAGE_KEY);
+    setApiKey('');
+    handleReset();
+  }
+
+  if (!apiKey) {
+    return <LandingPage onStart={handleStart} />;
+  }
+
   return (
     <div className="app">
-      <Header step={step} onReset={handleReset} />
+      <Header step={step} onReset={handleReset} onLogout={handleLogout} />
       <ProgressBar step={step} />
-
-      {apiKeyMissing && (
-        <div className="api-warning">
-          환경변수 <code>VITE_GEMINI_API_KEY</code>를 설정해주세요.
-          <br />
-          <span>.env 파일에 Gemini API 키를 입력한 뒤 서버를 재시작하세요.</span>
-        </div>
-      )}
 
       {step > 1 && (
         <SelectionSummary
@@ -93,6 +104,7 @@ export default function App() {
             setResults={setResults}
             error={error}
             setError={setError}
+            apiKey={apiKey}
             onGoToStep3={() => goTo(3)}
             onGoToStep1={() => {
               setResults(null);

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { strengthenName } from '../lib/gemini';
 
-export default function NameCard({ item }) {
+export default function NameCard({ item, apiKey }) {
   const [strengthened, setStrengthened] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -12,6 +12,7 @@ export default function NameCard({ item }) {
         name: item.name,
         story: item.story,
         patternName: item.pattern_used,
+        apiKey,
       });
       setStrengthened(result);
     } catch (err) {
