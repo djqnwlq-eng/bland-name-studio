@@ -4,6 +4,35 @@ function getGenAI(apiKey) {
   return new GoogleGenerativeAI(apiKey);
 }
 
+const MODEL_FALLBACKS = ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-2.0-flash'];
+
+function isRetryableError(err) {
+  const msg = String(err?.message ?? err);
+  return /\b(503|502|504|429|overloaded|high demand|UNAVAILABLE|Service Unavailable)\b/i.test(msg);
+}
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function generateWithRetry({ genAI, generationConfig, prompt }) {
+  let lastErr;
+  for (let modelIdx = 0; modelIdx < MODEL_FALLBACKS.length; modelIdx++) {
+    const modelName = MODEL_FALLBACKS[modelIdx];
+    const model = genAI.getGenerativeModel({ model: modelName, generationConfig });
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const result = await model.generateContent(prompt);
+        return result.response;
+      } catch (err) {
+        lastErr = err;
+        if (!isRetryableError(err)) throw err;
+        const delay = 800 * Math.pow(2, attempt) + Math.random() * 400;
+        await sleep(delay);
+      }
+    }
+  }
+  throw lastErr;
+}
+
 function parseJsonResponse(response) {
   const text = response?.text?.() ?? '';
   if (!text) {
@@ -25,14 +54,11 @@ function parseJsonResponse(response) {
 
 export async function generateNames({ position, coreValue, feeling, apiKey }) {
   const genAI = getGenAI(apiKey);
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-2.5-flash',
-    generationConfig: {
-      responseMimeType: 'application/json',
-      maxOutputTokens: 2048,
-      temperature: 0.9,
-    },
-  });
+  const generationConfig = {
+    responseMimeType: 'application/json',
+    maxOutputTokens: 2048,
+    temperature: 0.9,
+  };
 
   const prompt = `당신은 전문 화장품 브랜드 네이머입니다.
 
@@ -104,20 +130,17 @@ ${position.id === 'kbeauty' ? '7. 반드시 순수 한글 이름으로 생성 (�
   ]
 }`;
 
-  const result = await model.generateContent(prompt);
-  return parseJsonResponse(result.response);
+  const response = await generateWithRetry({ genAI, generationConfig, prompt });
+  return parseJsonResponse(response);
 }
 
 export async function strengthenName({ name, story, patternName, apiKey }) {
   const genAI = getGenAI(apiKey);
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-2.5-flash',
-    generationConfig: {
-      responseMimeType: 'application/json',
-      maxOutputTokens: 1024,
-      temperature: 0.9,
-    },
-  });
+  const generationConfig = {
+    responseMimeType: 'application/json',
+    maxOutputTokens: 1024,
+    temperature: 0.9,
+  };
 
   const prompt = `당신은 화장품 브랜드 네이밍 전문가입니다.
 
@@ -151,6 +174,6 @@ export async function strengthenName({ name, story, patternName, apiKey }) {
   ]
 }`;
 
-  const result = await model.generateContent(prompt);
-  return parseJsonResponse(result.response);
+  const response = await generateWithRetry({ genAI, generationConfig, prompt });
+  return parseJsonResponse(response);
 }
