@@ -8,7 +8,7 @@ const MODEL_FALLBACKS = ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-2.0-
 
 function isRetryableError(err) {
   const msg = String(err?.message ?? err);
-  return /\b(503|502|504|429|overloaded|high demand|UNAVAILABLE|Service Unavailable)\b/i.test(msg);
+  return /\b(503|502|504|429|overloaded|high demand|UNAVAILABLE|Service Unavailable|MAX_TOKENS)\b/i.test(msg);
 }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -17,10 +17,18 @@ async function generateWithRetry({ genAI, generationConfig, prompt }) {
   let lastErr;
   for (let modelIdx = 0; modelIdx < MODEL_FALLBACKS.length; modelIdx++) {
     const modelName = MODEL_FALLBACKS[modelIdx];
-    const model = genAI.getGenerativeModel({ model: modelName, generationConfig });
+    const modelConfig = { ...generationConfig };
+    if (modelName.startsWith('gemini-2.5')) {
+      modelConfig.thinkingConfig = { thinkingBudget: 0 };
+    }
+    const model = genAI.getGenerativeModel({ model: modelName, generationConfig: modelConfig });
     for (let attempt = 0; attempt < 3; attempt++) {
       try {
         const result = await model.generateContent(prompt);
+        const finishReason = result.response?.candidates?.[0]?.finishReason;
+        if (finishReason === 'MAX_TOKENS') {
+          throw new Error('MAX_TOKENS: 응답이 길이 제한으로 잘림');
+        }
         return result.response;
       } catch (err) {
         lastErr = err;
@@ -56,7 +64,7 @@ export async function generateNames({ position, coreValue, feeling, apiKey }) {
   const genAI = getGenAI(apiKey);
   const generationConfig = {
     responseMimeType: 'application/json',
-    maxOutputTokens: 2048,
+    maxOutputTokens: 8192,
     temperature: 0.9,
   };
 
@@ -138,7 +146,7 @@ export async function strengthenName({ name, story, patternName, apiKey }) {
   const genAI = getGenAI(apiKey);
   const generationConfig = {
     responseMimeType: 'application/json',
-    maxOutputTokens: 1024,
+    maxOutputTokens: 4096,
     temperature: 0.9,
   };
 
