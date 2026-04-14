@@ -4,9 +4,35 @@ function getGenAI(apiKey) {
   return new GoogleGenerativeAI(apiKey);
 }
 
+function parseJsonResponse(response) {
+  const text = response?.text?.() ?? '';
+  if (!text) {
+    const blockReason = response?.promptFeedback?.blockReason;
+    const finishReason = response?.candidates?.[0]?.finishReason;
+    throw new Error(
+      `Gemini 응답이 비어 있습니다 (blockReason=${blockReason ?? 'none'}, finishReason=${finishReason ?? 'none'})`
+    );
+  }
+  const cleaned = text.trim().replace(/^```json\s*|\s*```$/g, '');
+  const match = cleaned.match(/\{[\s\S]*\}/);
+  const jsonStr = match ? match[0] : cleaned;
+  try {
+    return JSON.parse(jsonStr);
+  } catch (e) {
+    throw new Error(`JSON 파싱 실패: ${e.message} | 응답 일부: ${text.slice(0, 200)}`);
+  }
+}
+
 export async function generateNames({ position, coreValue, feeling, apiKey }) {
   const genAI = getGenAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-2.5-flash',
+    generationConfig: {
+      responseMimeType: 'application/json',
+      maxOutputTokens: 2048,
+      temperature: 0.9,
+    },
+  });
 
   const prompt = `당신은 전문 화장품 브랜드 네이머입니다.
 
@@ -79,13 +105,19 @@ ${position.id === 'kbeauty' ? '7. 반드시 순수 한글 이름으로 생성 (�
 }`;
 
   const result = await model.generateContent(prompt);
-  const text = result.response.text().replace(/```json|```/g, '').trim();
-  return JSON.parse(text);
+  return parseJsonResponse(result.response);
 }
 
 export async function strengthenName({ name, story, patternName, apiKey }) {
   const genAI = getGenAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-2.5-flash',
+    generationConfig: {
+      responseMimeType: 'application/json',
+      maxOutputTokens: 1024,
+      temperature: 0.9,
+    },
+  });
 
   const prompt = `당신은 화장품 브랜드 네이밍 전문가입니다.
 
@@ -120,6 +152,5 @@ export async function strengthenName({ name, story, patternName, apiKey }) {
 }`;
 
   const result = await model.generateContent(prompt);
-  const text = result.response.text().replace(/```json|```/g, '').trim();
-  return JSON.parse(text);
+  return parseJsonResponse(result.response);
 }

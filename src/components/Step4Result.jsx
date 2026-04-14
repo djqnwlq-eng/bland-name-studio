@@ -25,7 +25,7 @@ export default function Step4Result({
       setResults(data.names);
     } catch (err) {
       console.error(err);
-      setError('이름 생성에 실패했습니다. 다시 시도해주세요.');
+      setError(`이름 생성에 실패했습니다. 다시 시도해주세요.\n(${err?.message ?? 'unknown error'})`);
     } finally {
       setLoading(false);
     }
