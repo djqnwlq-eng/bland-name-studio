@@ -106,9 +106,10 @@ export async function generateNames({ position, coreValue, feeling, apiKey }) {
 - 역사/지명: Beauty of Joseon(조선), Sol de Janeiro(리우의 태양), Sulwhasoo(설화수=눈꽃빛 秀), Laneige(프랑스어 눈)
 - 두문자/약어: MAC, NYX, AHC(Aesthetic Hydration Cosmetics), NARS, SK-II
 - 숫자/코드: 23yearsold, AGE20's, No7, Chanel N°5
-- 추상적 전환 사례: "덜어냄"→비움→공(空)→고요→"한율(한가위의 율동)", "순수"→이슬→새벽→"설화(雪花)", "빛남"→광채→달빛→"달빛뜰"
+- 추상적 전환 사례: "덜어냄"→비움→공(空)→고요→(고요를 담은 새 이름), "순수"→이슬→새벽→(새벽 이슬을 압축한 새 이름)
 
 위 브랜드들이 사용한 네이밍 기법(언어유희, 외국어 차용, 한자 뜻 조합, 자연 은유, 개념 압축)을 구조적으로 참고하세요.
+⚠️ 위 목록과 이 안내문에 나온 모든 이름(실제 브랜드명·예시명)은 기법 참고용일 뿐입니다. 그대로 쓰거나, 한두 글자만 바꾸거나, 일부로 포함한 이름은 절대 출력하지 마세요.
 
 [사용 가능한 네이밍 패턴]
 ① 창업자/인물명 - Chanel, Charlotte Tilbury, Huda Beauty
@@ -145,7 +146,7 @@ STEP 3. STEP 1과 STEP 2의 연상 결과를 교차 조합하여 브랜드명을
 4. 포지셔닝: ${position.name} (${position.desc})
 5. 이름은 반드시 발음 가능하고 기억에 남아야 함
 6. 상표 등록 가능성 고려 (일반명사 단독 사용 금지)
-${position.id === 'kbeauty' ? '7. 반드시 순수 한글 이름으로 생성 (예: 설화수, 아리따움, 한율, 달빛뜰)\n8. 한글 이름의 경우 pronunciation 필드에 영문 로마자 표기를 넣으세요 (예: "Sulwhasoo", "Aritaum", "Hanyul")' : ''}
+${position.id === 'kbeauty' ? '7. 반드시 순수 한글 이름으로 생성 (설화수·아리따움·한율 같은 한글 브랜드의 감각은 참고하되, 이 이름들은 쓰지 말 것)\n8. 한글 이름의 경우 pronunciation 필드에 영문 로마자 표기를 넣으세요 (예: 이름이 "솔바람"이면 "Solbaram")' : ''}
 
 [사용자 입력 - 두 가지 모두 반드시 확장 후 반영]
 핵심가치: ${coreValue}
