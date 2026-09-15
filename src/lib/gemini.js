@@ -4,11 +4,26 @@ function getGenAI(apiKey) {
   return new GoogleGenerativeAI(apiKey);
 }
 
-const MODEL_FALLBACKS = ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-2.0-flash'];
+// gemini-flash-latest는 3.x 계열을 가리킴. 2.5는 기존 키 사용자를 위한 마지막 예비.
+const MODEL_FALLBACKS = ['gemini-3.6-flash', 'gemini-flash-latest', 'gemini-2.5-flash'];
 
 function isRetryableError(err) {
   const msg = String(err?.message ?? err);
   return /\b(503|502|504|429|overloaded|high demand|UNAVAILABLE|Service Unavailable|MAX_TOKENS)\b/i.test(msg);
+}
+
+// 모델이 종료됐거나 해당 키에서 사용할 수 없는 경우 → 재시도 없이 다음 모델로
+function isModelUnavailableError(err) {
+  const msg = String(err?.message ?? err);
+  return /\[404\b|NOT_FOUND|no longer available|is not found|not supported for generateContent/i.test(msg);
+}
+
+function getThinkingConfig(modelName) {
+  if (modelName.startsWith('gemini-2.5')) return { thinkingBudget: 0 };
+  // 3.x 계열은 thinking을 끌 수 없어 낮은 단계로 설정 (응답 속도·JSON 잘림 방지)
+  // gemini-flash-latest(3.5)는 minimal 미지원 → low
+  if (modelName === 'gemini-3.6-flash') return { thinkingLevel: 'minimal' };
+  return { thinkingLevel: 'low' };
 }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -17,10 +32,7 @@ async function generateWithRetry({ genAI, generationConfig, prompt }) {
   let lastErr;
   for (let modelIdx = 0; modelIdx < MODEL_FALLBACKS.length; modelIdx++) {
     const modelName = MODEL_FALLBACKS[modelIdx];
-    const modelConfig = { ...generationConfig };
-    if (modelName.startsWith('gemini-2.5')) {
-      modelConfig.thinkingConfig = { thinkingBudget: 0 };
-    }
+    const modelConfig = { ...generationConfig, thinkingConfig: getThinkingConfig(modelName) };
     const model = genAI.getGenerativeModel({ model: modelName, generationConfig: modelConfig });
     for (let attempt = 0; attempt < 3; attempt++) {
       try {
@@ -32,6 +44,7 @@ async function generateWithRetry({ genAI, generationConfig, prompt }) {
         return result.response;
       } catch (err) {
         lastErr = err;
+        if (isModelUnavailableError(err)) break;
         if (!isRetryableError(err)) throw err;
         const delay = 800 * Math.pow(2, attempt) + Math.random() * 400;
         await sleep(delay);
@@ -58,6 +71,21 @@ function parseJsonResponse(response) {
   } catch (e) {
     throw new Error(`JSON 파싱 실패: ${e.message} | 응답 일부: ${text.slice(0, 200)}`);
   }
+}
+
+// 3.x 모델이 배열 항목을 객체 대신 JSON 문자열로 주는 경우가 있어 객체로 풀어줌
+function normalizeItems(items) {
+  if (!Array.isArray(items)) return items;
+  return items
+    .map((item) => {
+      if (typeof item !== 'string') return item;
+      try {
+        return JSON.parse(item);
+      } catch {
+        return null;
+      }
+    })
+    .filter((item) => item && item.name);
 }
 
 export async function generateNames({ position, coreValue, feeling, apiKey }) {
@@ -139,7 +167,9 @@ ${position.id === 'kbeauty' ? '7. 반드시 순수 한글 이름으로 생성 (�
 }`;
 
   const response = await generateWithRetry({ genAI, generationConfig, prompt });
-  return parseJsonResponse(response);
+  const data = parseJsonResponse(response);
+  data.names = normalizeItems(data.names);
+  return data;
 }
 
 export async function strengthenName({ name, story, patternName, apiKey }) {
@@ -183,5 +213,7 @@ export async function strengthenName({ name, story, patternName, apiKey }) {
 }`;
 
   const response = await generateWithRetry({ genAI, generationConfig, prompt });
-  return parseJsonResponse(response);
+  const data = parseJsonResponse(response);
+  data.options = normalizeItems(data.options);
+  return data;
 }
