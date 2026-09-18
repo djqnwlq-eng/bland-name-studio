@@ -7,9 +7,19 @@ function getGenAI(apiKey) {
 // gemini-flash-latest는 3.x 계열을 가리킴. 2.5는 기존 키 사용자를 위한 마지막 예비.
 const MODEL_FALLBACKS = ['gemini-3.6-flash', 'gemini-flash-latest', 'gemini-2.5-flash'];
 
+// 응답이 영영 오지 않는 경우를 대비한 요청당 시간 제한
+const REQUEST_TIMEOUT_MS = 45000;
+
 function isRetryableError(err) {
   const msg = String(err?.message ?? err);
-  return /\b(503|502|504|429|overloaded|high demand|UNAVAILABLE|Service Unavailable|MAX_TOKENS)\b/i.test(msg);
+  return /\b(503|502|504|429|overloaded|high demand|UNAVAILABLE|Service Unavailable|MAX_TOKENS)\b/i.test(msg)
+    || isTimeoutOrNetworkError(err);
+}
+
+// 시간 초과 / 네트워크 차단 (보안 프로그램, 방화벽, 확장 프로그램 등)
+function isTimeoutOrNetworkError(err) {
+  const msg = String(err?.message ?? err);
+  return /timeout|aborted|AbortError|Failed to fetch|NetworkError|network error|ERR_/i.test(msg);
 }
 
 // 모델이 종료됐거나 해당 키에서 사용할 수 없는 경우 → 재시도 없이 다음 모델로
@@ -33,7 +43,10 @@ async function generateWithRetry({ genAI, generationConfig, prompt }) {
   for (let modelIdx = 0; modelIdx < MODEL_FALLBACKS.length; modelIdx++) {
     const modelName = MODEL_FALLBACKS[modelIdx];
     const modelConfig = { ...generationConfig, thinkingConfig: getThinkingConfig(modelName) };
-    const model = genAI.getGenerativeModel({ model: modelName, generationConfig: modelConfig });
+    const model = genAI.getGenerativeModel(
+      { model: modelName, generationConfig: modelConfig },
+      { timeout: REQUEST_TIMEOUT_MS }
+    );
     for (let attempt = 0; attempt < 3; attempt++) {
       try {
         const result = await model.generateContent(prompt);
@@ -50,6 +63,12 @@ async function generateWithRetry({ genAI, generationConfig, prompt }) {
         await sleep(delay);
       }
     }
+  }
+  if (isTimeoutOrNetworkError(lastErr)) {
+    throw new Error(
+      `연결 시간 초과: 구글 AI 서버에서 응답이 오지 않았습니다. ` +
+        `다른 네트워크(휴대폰 테더링 등)나 시크릿 창에서 시도해 보세요. (원인: ${String(lastErr?.message ?? lastErr).slice(0, 120)})`
+    );
   }
   throw lastErr;
 }
