@@ -518,6 +518,11 @@ body {
   color: var(--red);
   margin-bottom: 16px;
   font-size: 14px;
+  white-space: pre-line;
+  text-align: left;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* ───── Name Card ───── */

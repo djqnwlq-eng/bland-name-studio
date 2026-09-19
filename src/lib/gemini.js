@@ -40,6 +40,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function generateWithRetry({ genAI, generationConfig, prompt }) {
   let lastErr;
+  // 모델별 실패 사유를 모아 두어야 원인 파악이 가능 (마지막 오류만 보면 오해하기 쉬움)
+  const failures = [];
   for (let modelIdx = 0; modelIdx < MODEL_FALLBACKS.length; modelIdx++) {
     const modelName = MODEL_FALLBACKS[modelIdx];
     const modelConfig = { ...generationConfig, thinkingConfig: getThinkingConfig(modelName) };
@@ -57,19 +59,26 @@ async function generateWithRetry({ genAI, generationConfig, prompt }) {
         return result.response;
       } catch (err) {
         lastErr = err;
+        const brief = String(err?.message ?? err).replace(/Error fetching from \S+: /, '').slice(0, 100);
+        failures.push(`${modelName} → ${brief}`);
         if (isModelUnavailableError(err)) break;
-        if (!isRetryableError(err)) throw err;
+        if (!isRetryableError(err)) {
+          err.message = `[APP v2] ${err.message}\n\n시도 내역:\n- ${failures.join('\n- ')}`;
+          throw err;
+        }
         const delay = 800 * Math.pow(2, attempt) + Math.random() * 400;
         await sleep(delay);
       }
     }
   }
+  const trail = `\n\n시도 내역:\n- ${failures.join('\n- ')}`;
   if (isTimeoutOrNetworkError(lastErr)) {
     throw new Error(
-      `연결 시간 초과: 구글 AI 서버에서 응답이 오지 않았습니다. ` +
-        `다른 네트워크(휴대폰 테더링 등)나 시크릿 창에서 시도해 보세요. (원인: ${String(lastErr?.message ?? lastErr).slice(0, 120)})`
+      `[APP v2] 연결 시간 초과: 구글 AI 서버에서 응답이 오지 않았습니다. ` +
+        `다른 네트워크(휴대폰 테더링 등)나 시크릿 창에서 시도해 보세요.${trail}`
     );
   }
+  lastErr.message = `[APP v2] ${lastErr.message}${trail}`;
   throw lastErr;
 }
 
