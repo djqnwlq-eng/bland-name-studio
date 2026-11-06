@@ -6,18 +6,21 @@ function getGenAI(apiKey) {
 
 // 503(혼잡) 대비로 계열이 다른 모델을 섞어 둠. lite 계열은 혼잡이 덜하고 응답도 빠름.
 // thinkingLevel: 3.6과 lite 계열은 minimal 지원, 3.8/flash-latest는 low만 지원.
+// lite 계열이 혼잡도 덜하고 응답도 빨라 바로 다음 순서로 둠
 const MODEL_FALLBACKS = [
   { name: 'gemini-3.6-flash', thinkingLevel: 'minimal' },
-  { name: 'gemini-3.8-flash', thinkingLevel: 'low' },
-  { name: 'gemini-flash-latest', thinkingLevel: 'low' },
   { name: 'gemini-3.5-flash-lite', thinkingLevel: 'minimal' },
   { name: 'gemini-flash-lite-latest', thinkingLevel: 'minimal' },
+  { name: 'gemini-3.8-flash', thinkingLevel: 'low' },
+  { name: 'gemini-flash-latest', thinkingLevel: 'low' },
   // 신규 키에서는 404. 기존 키 사용자를 위한 마지막 예비.
   { name: 'gemini-2.5-flash', thinkingBudget: 0 },
 ];
 
-// 응답이 영영 오지 않는 경우를 대비한 요청당 시간 제한
-const REQUEST_TIMEOUT_MS = 45000;
+// 정상 생성은 10초 안쪽. 응답이 늦으면 기다리기보다 다른 모델로 넘어가는 편이 빠름
+const REQUEST_TIMEOUT_MS = 20000;
+// 모델을 돌아가며 시도하더라도 사용자가 기다리는 총 시간은 제한
+const TOTAL_BUDGET_MS = 45000;
 
 function isRetryableError(err) {
   const msg = String(err?.message ?? err);
@@ -41,6 +44,31 @@ function getThinkingConfig(model) {
   return model.thinkingLevel ? { thinkingLevel: model.thinkingLevel } : { thinkingBudget: model.thinkingBudget };
 }
 
+// 결제 크레딧 소진(402): 결제 계정 단위 문제라 다른 모델로 바꿔도 동일 → 즉시 안내
+function isBillingError(err) {
+  return /\[402\b|Payment Required|prepayment credits are depleted/i.test(String(err?.message ?? err));
+}
+
+// 키 자체가 잘못된 경우 (앞뒤 공백/줄바꿈이 섞여 들어오는 경우가 많음)
+function isInvalidKeyError(err) {
+  return /API_KEY_INVALID|API key not valid|API key expired/i.test(String(err?.message ?? err));
+}
+
+const INVALID_KEY_GUIDE =
+  '입력한 API 키가 올바르지 않습니다.\n' +
+  '키 전체를 다시 복사해서 오른쪽 위 "API 키 변경"에 붙여넣어 주세요. (키는 보통 AIza로 시작합니다)';
+
+// 무료 사용량 한도 초과
+function isQuotaError(err) {
+  return /\[429\b|RESOURCE_EXHAUSTED|quota|rate limit/i.test(String(err?.message ?? err));
+}
+
+const BILLING_GUIDE =
+  '구글 AI 결제 크레딧이 모두 소진되어 생성할 수 없습니다.\n' +
+  '해결 방법은 두 가지입니다.\n' +
+  '1) AI Studio 결제 페이지(https://aistudio.google.com/usage)에서 크레딧을 충전\n' +
+  '2) 결제가 연결되지 않은 새 프로젝트에서 API 키를 새로 발급받아 "API 키 변경"에 입력 (무료 사용량으로 이용)';
+
 function isOverloadedError(err) {
   return /\b(503|502|504|overloaded|high demand|UNAVAILABLE|Service Unavailable)\b/i.test(String(err?.message ?? err));
 }
@@ -51,7 +79,10 @@ async function generateWithRetry({ genAI, generationConfig, prompt }) {
   let lastErr;
   // 모델별 실패 사유를 모아 두어야 원인 파악이 가능 (마지막 오류만 보면 오해하기 쉬움)
   const failures = [];
+  const startedAt = Date.now();
   for (let modelIdx = 0; modelIdx < MODEL_FALLBACKS.length; modelIdx++) {
+    // 남은 시간이 거의 없으면 더 시도하지 않고 안내 메시지로 종료
+    if (Date.now() - startedAt > TOTAL_BUDGET_MS) break;
     const modelName = MODEL_FALLBACKS[modelIdx].name;
     const modelConfig = { ...generationConfig, thinkingConfig: getThinkingConfig(MODEL_FALLBACKS[modelIdx]) };
     const model = genAI.getGenerativeModel(
@@ -61,6 +92,7 @@ async function generateWithRetry({ genAI, generationConfig, prompt }) {
     // 혼잡(503)은 모델을 바꾸면 해결되는 경우가 많아 같은 모델에 오래 매달리지 않음
     const maxAttempts = 2;
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      if (Date.now() - startedAt > TOTAL_BUDGET_MS) break;
       try {
         const result = await model.generateContent(prompt);
         const finishReason = result.response?.candidates?.[0]?.finishReason;
@@ -72,6 +104,8 @@ async function generateWithRetry({ genAI, generationConfig, prompt }) {
         lastErr = err;
         const brief = String(err?.message ?? err).replace(/Error fetching from \S+: /, '').slice(0, 100);
         failures.push(`${modelName} → ${brief}`);
+        if (isBillingError(err)) throw new Error(BILLING_GUIDE);
+        if (isInvalidKeyError(err)) throw new Error(INVALID_KEY_GUIDE);
         if (isModelUnavailableError(err)) break;
         if (!isRetryableError(err)) {
           err.message = `${err.message}\n\n(자세한 내용)\n- ${failures.join('\n- ')}\n[앱 버전 v3]`;
@@ -84,6 +118,13 @@ async function generateWithRetry({ genAI, generationConfig, prompt }) {
     }
   }
   const trail = `\n\n(자세한 내용)\n- ${failures.join('\n- ')}\n[앱 버전 v3]`;
+  if (isBillingError(lastErr)) throw new Error(BILLING_GUIDE);
+  if (isQuotaError(lastErr)) {
+    throw new Error(
+      `오늘 사용할 수 있는 무료 사용량을 모두 쓴 것으로 보입니다.\n` +
+        `잠시 뒤에 다시 시도하시거나, 사용량이 초기화된 뒤 이용해 주세요.${trail}`
+    );
+  }
   if (isOverloadedError(lastErr)) {
     throw new Error(
       `지금 구글 AI 서버가 혼잡합니다. 30초~1분 뒤에 "다시 시도"를 눌러 주세요.\n` +

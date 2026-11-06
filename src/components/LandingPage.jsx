@@ -76,7 +76,17 @@ export default function LandingPage({ onStart }) {
                   접속 후 구글 로그인
                 </li>
                 <li>"API 키 만들기" 버튼 클릭</li>
-                <li>생성된 키를 복사하여 위 입력란에 붙여넣기</li>
+                <li>
+                  생성된 키를 복사하여 위 입력란에 붙여넣기{' '}
+                  <a
+                    className="guide-detail-link"
+                    href="/gemini-key-guide.html"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    자세히 보기
+                  </a>
+                </li>
               </ol>
 
               <hr />
